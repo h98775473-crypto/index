@@ -116,7 +116,7 @@ $("#kensaku").on("click", async function () {
                     count: ryou.value,
                     start: 1
                 });
-                const bookdata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/all?" + query_params)).json();
+                const bookdata = await (await fetch("https://server-gtul.onrender.com/cinii-proxy/opensearch/all?" + query_params)).json();
 
                 console.log(bookdata["items"]);
 
@@ -127,7 +127,7 @@ $("#kensaku").on("click", async function () {
                             q: qq.replace(/[^0-9]/g, '')
                         });
 
-                        let creadata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/author?" + creatorquery)).json();
+                        let creadata = await (await fetch("https://server-gtul.onrender.com/cinii-proxy/opensearch/author?" + creatorquery)).json();
 
                         if (creadata[0] != '') {
                             for (let l = 0; creadata[l] != ""; l++) {
