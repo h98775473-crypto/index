@@ -1,0 +1,123 @@
+@charset "UTF-8";
+
+body{
+    font-size:16px;
+    line-height: 1.5;
+    color:#424242;    
+    font-family: 'Roboto', "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", "游ゴシック", YuGothic,'Meiryo UI',Meiryo,"ＭＳ ゴシック",Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-image: url("back.png");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+}
+.page-title{
+    margin-bottom: 24px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    background: #cde4ff;
+}
+.box1{
+    width: 640px;
+    margin: 24px auto 64px;
+    font-size: 18px;
+    display: grid;
+    justify-items: center;
+}
+.box2{
+    width: 480px;
+    margin: 24px auto 64px;
+    font-size: 18px;
+    display: grid;
+    justify-items: center;
+}
+.box-item1{
+    margin-top: 12px;
+    margin-bottom: 12px;
+    display: flex;
+}
+.box-item2{
+    margin-right: 32px;
+}
+.box-item3{
+    height: 160px;
+    width: 480px;
+    margin-top: 8px;
+    font-weight: bold;
+    color: #6091d3;
+    background: #FFF;
+    border: solid 3px #6091d3;
+    border-radius: 10px;
+    overflow-wrap: break-word;
+}
+.box-item3_{
+    height: 160px;
+    width: 480px;
+    margin-top: 8px;
+}
+
+.box-title{
+    display: inline-block;
+    width: 180px;
+    text-align: right;
+}
+
+.hidden{
+    display: none;
+}
+
+
+.box11{
+    width: 640px;
+    margin: 16px auto 32px;
+    font-size: 18px;
+    display: grid;
+    justify-items: center;
+    color: #5d627b;
+    background: white;
+    border-top: solid 5px #5d627b;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
+}
+
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#popup-content {
+    position: absolute; /* 親要素（オーバーレイ）に対して絶対位置指定 */
+    top: 50%; /* 親要素の上から50%の位置 */
+    left: 50%; /* 親要素の左から50%の位置 */
+    transform: translate(-50%, -50%); /* 要素自体のサイズ分を半分ずらして中央へ */
+
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    width: 80%;
+    max-width: 1000px;
+}
+
+.popup-btn {
+    position: fixed;
+    bottom: 10px;
+    right: 20px;
+    z-index: 9990;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}

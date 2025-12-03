@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>学校検索アプリ</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <h1 class="page-title">学校検索アプリ</h1>
+
+  <div class="box11">
+    <div class="box-item1">
+      <p>大学で学びたいことを入力してください<br>曖昧な言葉でもかまいません</p><br>
+      <input type="text" id="keyword" value="">
+      <button id="kensaku">検索</button>
+    </div>
+    <div class="box-item1">
+      <p class="box-item2">論文検索詳細設定</p>
+      <p>検索幅</p><input type="number" id="haba" min="1" max="11" value="5">
+      <p>検索量</p><input type="number" id="ryou" min="10" max="300" value="50">
+    </div>
+    <p class="box-item1">絞り込み条件</p>
+    <div class="box-item1">
+      <p>偏差値 上限</p>
+      <input type="text" id="hen_u" value="">
+      <p>～</p>
+      <input type="text" id="hen_s" value="">
+      <p>下限</p>
+    </div>
+    <div class="box-item1">
+      <p>地域（地方、都道府県、市町村問いません）</p>
+      <input type="text" id="zyusyo" value="">
+    </div>
+  </div>
+
+  <div class="box2">
+    <div class="box-item1">
+      <button type="button" id="pageh" class="hidden">←</button>
+      <p id="pages"></p>
+      <button type="button" id="pagem" class="hidden">→</button>
+    </div>
+    <div id="k1" class="box-item3_">
+      <p id="kouho1"></p>
+      <a id="urlkouho1" href="" target="_blank"></a>
+    </div>
+    <div id="k2" class="box-item3_">
+      <p id="kouho2"></p>
+      <a id="urlkouho2" href="" target="_blank"></a>
+    </div>
+    <div id="k3" class="box-item3_">
+      <p id="kouho3"></p>
+      <a id="urlkouho3" href="" target="_blank"></a>
+    </div>
+  </div>
+
+
+  <button id="open-popup-btn" class="popup-btn">ヘルプ</button>
+
+  <div id="popup-overlay">
+    <div id="popup-content">
+      <img src="info.png" height="50%" width="100%">
+      <h2 style="font-size: 20px;">このソフトはCINII(NII学術情報ナビゲータ)とGeminiのAPIを用いた大学検索ソフトウェアです。</h2>
+      <p>
+        ➀に入力されたキーワードに関連する単語を➁の検索幅分(1の場合入力されたキーワードのみ)Geminiに提案させ、
+        入力されたキーワードと提案された関連ワードでそれぞれ➁の検索量分CINIIで検索を行う。
+        調べた学術情報の著者の所属機関をGeminiに大学であるか確認した後、
+        検索結果に含まれていない条件と合致する大学をGeminiに出力してもらい、その結果をすべて表示します。<br>
+        ➀...検索キーワード入力欄 入力必須<br>
+        ➁...CINIIでの検索幅・量入力欄(幅は1以上11以下 量は10以上300以下) 入力必須<br>
+        ➂...検索条件入力欄 任意入力<br>
+        ➃...検索ページ欄 ●が現在のページ矢印ボタンでページ変更<br>
+        ➄...検索結果 大学名、学部名、特色説明、ホームページURLが表示されます。ただし、Geminiを検索で用いているので間違っている場合もあります。<br><br>
+      </p>
+      <button id="close-popup-btn" class="popup-btn">閉じる</button>
+    </div>
+  </div>
+
+  <script src="js/jquery-3.7.1.min.js"></script>
+  <script src="js/script.js" type="module"></script>
+</body>
+
+</html>
