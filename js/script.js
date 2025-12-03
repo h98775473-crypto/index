@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyBo_kA9bsqqPHm2gK-JCS2wFvw-K-hrZ1I" });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API });
 
 
 const word = $("#keyword")[0];
