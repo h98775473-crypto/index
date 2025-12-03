@@ -1,0 +1,1 @@
+もともとローカル環境で動かすためのアプリをWeb公開用に修正したので<>Codeからcodespacesを開いてもらいそこでnpm install→npm startを実行する必要があります
