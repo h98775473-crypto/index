@@ -78,179 +78,184 @@ async function pagess() {
 
 //検索処理
 $("#kensaku").on("click", async function () {
-    if (word.value != "" && haba.value >= 1 && haba.value <= 11 && ryou.value >= 10 && ryou.value <= 300) {
-        $("#pageh").addClass("hidden");
-        $("#pagem").addClass("hidden");
-        $("#pages").html("検索中...\nこの作業は数分かかる可能性があります")
-        for (let i = 0; i < 3; i++) {
-            $("#k" + String(i + 1)).removeClass("box-item3")
-            $("#k" + String(i + 1)).addClass("box-item3_")
-            $("#kouho" + String(i + 1)).html("");
-            $("#urlkouho" + String(i + 1)).html("");
-            $("#urlkouho" + String(i + 1)).attr("href", "");
-        }
+    try {
 
-
-        response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: "[0][faculty]に「" + word.value + "」をそのまま返してください。そして[1][faculty]以降にそれと関係ありそうな単語を10回いれてください",
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: schema_2
+        if (word.value != "" && haba.value >= 1 && haba.value <= 11 && ryou.value >= 10 && ryou.value <= 300) {
+            $("#pageh").addClass("hidden");
+            $("#pagem").addClass("hidden");
+            $("#pages").html("検索中...\nこの作業は数分かかる可能性があります")
+            for (let i = 0; i < 3; i++) {
+                $("#k" + String(i + 1)).removeClass("box-item3")
+                $("#k" + String(i + 1)).addClass("box-item3_")
+                $("#kouho" + String(i + 1)).html("");
+                $("#urlkouho" + String(i + 1)).html("");
+                $("#urlkouho" + String(i + 1)).attr("href", "");
             }
-        });
-        jsonresponse = JSON.parse(response.text);
-        console.log(jsonresponse);
 
-        let organizations = [];
 
-        for (let cnt = 0; cnt < haba.value; cnt++) {
-            temp = jsonresponse[cnt]["faculty"];
-
-            const query_params = new URLSearchParams({
-                q: temp,
-                lang: "jpn",
-                format: "json",
-                count: ryou.value,
-                start: 1
+            response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: "[0][faculty]に「" + word.value + "」をそのまま返してください。そして[1][faculty]以降にそれと関係ありそうな単語を10回いれてください",
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema_2
+                }
             });
-            const bookdata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/all?" + query_params)).json();
+            jsonresponse = JSON.parse(response.text);
+            console.log(jsonresponse);
 
-            console.log(bookdata["items"]);
+            let organizations = [];
 
-            for (let i = 0; i < ryou.value; i++) {
-                try {
-                    let qq = bookdata["items"][i]["@id"];
-                    let creatorquery = new URLSearchParams({
-                        q: qq.replace(/[^0-9]/g, '')
-                    });
+            for (let cnt = 0; cnt < haba.value; cnt++) {
+                temp = jsonresponse[cnt]["faculty"];
 
-                    let creadata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/author?" + creatorquery)).json();
+                const query_params = new URLSearchParams({
+                    q: temp,
+                    lang: "jpn",
+                    format: "json",
+                    count: ryou.value,
+                    start: 1
+                });
+                const bookdata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/all?" + query_params)).json();
 
-                    if (creadata[0] != '') {
-                        for (let l = 0; creadata[l] != ""; l++) {
-                            if (!organizations.includes(creadata[l])) {
-                                organizations.push(creadata[l]);
+                console.log(bookdata["items"]);
+
+                for (let i = 0; i < ryou.value; i++) {
+                    try {
+                        let qq = bookdata["items"][i]["@id"];
+                        let creatorquery = new URLSearchParams({
+                            q: qq.replace(/[^0-9]/g, '')
+                        });
+
+                        let creadata = await (await fetch("https://server-gtul.onrender.com:10000/cinii-proxy/opensearch/author?" + creatorquery)).json();
+
+                        if (creadata[0] != '') {
+                            for (let l = 0; creadata[l] != ""; l++) {
+                                if (!organizations.includes(creadata[l])) {
+                                    organizations.push(creadata[l]);
+                                }
                             }
                         }
+                    } catch (error) {
+                        i = ryou.value;
                     }
-                } catch (error) {
-                    i = ryou.value;
+                }
+
+            }
+
+
+            console.log(organizations);
+
+            let bun = `大学の情報をを指定のJSON形式で教えてください`;
+
+            if ((hens.value != "") | (henu.value != "")) {
+                bun = "の" + bun;
+                if (hens.value != "") {
+                    bun = hens.value + "以上" + bun;
+                }
+                if (henu.value != "") {
+                    bun = henu.value + "以下" + bun;
+                }
+                bun = "偏差値" + bun;
+            }
+
+            if (zyu.value != "") {
+                bun = zyu.value + "にある" + bun;
+            }
+            bun = `次の配列の中にある${word.value}に関係する学部が存在する` + bun + "[" + organizations.toString() + "] なお重複はなくして、関係の大きい大学の順番に並べてください。";
+
+            console.log(bun);
+
+            response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: bun,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema_1
+                }
+            });
+            jsonresponse = JSON.parse(response.text);
+            console.log(jsonresponse);
+
+
+
+            temp = "";
+            for (let n = 0; n < jsonresponse.length; n++) {
+                temp += jsonresponse[n]["sc_name"] + ","
+            }
+            bun = word.value + "に関係ありそうな大学とその学部を可能な限り多く条件と一致するもの調べて下さい。ただし次の配列の中にない大学のみにしてください。また数分時間がかかっても構いませんので絶対に調べ漏れがないようにしてください[" + temp + "]";
+
+            if ((hens.value != "") | (henu.value != "")) {
+                bun = "の" + bun;
+                if (hens.value != "") {
+                    bun = hens.value + "以上" + bun;
+                }
+                if (henu.value != "") {
+                    bun = henu.value + "以下" + bun;
+                }
+                bun = "偏差値" + bun;
+            }
+
+            if (zyu.value != "") {
+                bun = zyu.value + "にある" + bun;
+            }
+
+            console.log(bun);
+
+            response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: bun,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema_1
+                }
+            });
+            temp = JSON.parse(response.text);
+            for (let n = 0; n < temp.length; n++) {
+                jsonresponse.push(temp[n]);
+            }
+            console.log(jsonresponse);
+
+
+            temp = 0;
+            if (jsonresponse.length % 3 != 0) {
+                temp = 3 - jsonresponse.length % 3;
+            }
+            for (let n = 0; n < temp; n++) {
+                jsonresponse.push({
+                    sc_name: "null",
+                    sc_faculty: "",
+                    sc_info: "",
+                    sc_url: ""
+                });
+            }
+
+
+
+            resultlength = jsonresponse.length
+            resultnow = 0;
+            pagess();
+            for (let i = 0; i < 3; i++) {
+                if (jsonresponse[i]["sc_name"] != "null") {
+                    $("#kouho" + String(i + 1)).html(jsonresponse[i]["sc_name"] + "<br>  " + jsonresponse[i]["sc_faculty"] + "<br>  " + jsonresponse[i]["sc_info"]);
+                    $("#urlkouho" + String(i + 1)).html(jsonresponse[i]["sc_url"]);
+                    $("#urlkouho" + String(i + 1)).attr("href", jsonresponse[i]["sc_url"]);
                 }
             }
 
-        }
-
-
-        console.log(organizations);
-
-        let bun = `大学の情報をを指定のJSON形式で教えてください`;
-
-        if ((hens.value != "") | (henu.value != "")) {
-            bun = "の" + bun;
-            if (hens.value != "") {
-                bun = hens.value + "以上" + bun;
+            $("#pageh").removeClass("hidden");
+            $("#pagem").removeClass("hidden");
+            for (let i = 0; i < 3; i++) {
+                if (jsonresponse[i]["sc_name"] != "null") {
+                    $("#k" + String(i + 1)).removeClass("box-item3_");
+                    $("#k" + String(i + 1)).addClass("box-item3");
+                }
             }
-            if (henu.value != "") {
-                bun = henu.value + "以下" + bun;
-            }
-            bun = "偏差値" + bun;
+        } else {
+            alert("入力が正しくありません\n正しい入力方法は右下のヘルプからご参照ください")
         }
-
-        if (zyu.value != "") {
-            bun = zyu.value + "にある" + bun;
-        }
-        bun = `次の配列の中にある${word.value}に関係する学部が存在する` + bun + "[" + organizations.toString() + "] なお重複はなくして、関係の大きい大学の順番に並べてください。";
-
-        console.log(bun);
-
-        response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: bun,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: schema_1
-            }
-        });
-        jsonresponse = JSON.parse(response.text);
-        console.log(jsonresponse);
-
-
-
-        temp = "";
-        for (let n = 0; n < jsonresponse.length; n++) {
-            temp += jsonresponse[n]["sc_name"] + ","
-        }
-        bun = word.value + "に関係ありそうな大学とその学部を可能な限り多く条件と一致するもの調べて下さい。ただし次の配列の中にない大学のみにしてください。また数分時間がかかっても構いませんので絶対に調べ漏れがないようにしてください[" + temp + "]";
-
-        if ((hens.value != "") | (henu.value != "")) {
-            bun = "の" + bun;
-            if (hens.value != "") {
-                bun = hens.value + "以上" + bun;
-            }
-            if (henu.value != "") {
-                bun = henu.value + "以下" + bun;
-            }
-            bun = "偏差値" + bun;
-        }
-
-        if (zyu.value != "") {
-            bun = zyu.value + "にある" + bun;
-        }
-
-        console.log(bun);
-
-        response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: bun,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: schema_1
-            }
-        });
-        temp = JSON.parse(response.text);
-        for (let n = 0; n < temp.length; n++) {
-            jsonresponse.push(temp[n]);
-        }
-        console.log(jsonresponse);
-
-
-        temp = 0;
-        if (jsonresponse.length % 3 != 0) {
-            temp = 3 - jsonresponse.length % 3;
-        }
-        for (let n = 0; n < temp; n++) {
-            jsonresponse.push({
-                sc_name: "null",
-                sc_faculty: "",
-                sc_info: "",
-                sc_url: ""
-            });
-        }
-
-
-
-        resultlength = jsonresponse.length
-        resultnow = 0;
-        pagess();
-        for (let i = 0; i < 3; i++) {
-            if (jsonresponse[i]["sc_name"] != "null") {
-                $("#kouho" + String(i + 1)).html(jsonresponse[i]["sc_name"] + "<br>  " + jsonresponse[i]["sc_faculty"] + "<br>  " + jsonresponse[i]["sc_info"]);
-                $("#urlkouho" + String(i + 1)).html(jsonresponse[i]["sc_url"]);
-                $("#urlkouho" + String(i + 1)).attr("href", jsonresponse[i]["sc_url"]);
-            }
-        }
-
-        $("#pageh").removeClass("hidden");
-        $("#pagem").removeClass("hidden");
-        for (let i = 0; i < 3; i++) {
-            if (jsonresponse[i]["sc_name"] != "null") {
-                $("#k" + String(i + 1)).removeClass("box-item3_");
-                $("#k" + String(i + 1)).addClass("box-item3");
-            }
-        }
-    } else {
-        alert("入力が正しくありません\n正しい入力方法は右下のヘルプからご参照ください")
+    } catch {
+        $("#pages").html("サーバー側でエラーが発生したようです\n申し訳ございませんが現在ご利用いただけません")
     }
 
 });
